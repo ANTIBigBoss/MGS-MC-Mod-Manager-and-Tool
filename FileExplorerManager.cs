@@ -290,10 +290,27 @@ namespace ANTIBigBoss_MGS_Mod_Manager
         {
             string[] requiredFiles =
             {
-                "d3d11.dll",
+                "winhttp.dll",
+                "wininet.dll",
                 "MGSHDFix.asi",
                 "MGSHDFix.ini",
                 "README.md",
+                "UltimateASILoader_LICENSE.md"
+            };
+            var filesInRoot = Directory.GetFiles(modPath, "*", IOSearchOption.AllDirectories)
+                .Select(f => Path.GetFileName(f))
+                .ToList();
+            return requiredFiles.All(reqFile =>
+                filesInRoot.Any(f => string.Equals(f, reqFile, StringComparison.OrdinalIgnoreCase)));
+        }
+        public bool IsMGSFPSUnlockMod(string modPath)
+        {
+            string[] requiredFiles =
+            {
+                "winhttp.dll",
+                "wininet.dll",
+                "MGSFPSUnlock.asi",
+                "MGSFPSUnlock.ini",
                 "UltimateASILoader_LICENSE.md"
             };
             var filesInRoot = Directory.GetFiles(modPath, "*", IOSearchOption.AllDirectories)

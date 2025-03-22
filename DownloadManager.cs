@@ -24,6 +24,7 @@ namespace ANTIBigBoss_MGS_Mod_Manager
             modRepositories = new List<ModRepository>
             {
                 new ModRepository { Owner = "cipherxof", Repo = "MGS3CrouchWalk", Name = "MGS3 Crouch Walk" },
+                new ModRepository { Owner = "cipherxof", Repo = "MGSFPSUnlock", Name = "MGS FPS Unlock" },
                 new ModRepository { Owner = "Lyall", Repo = "MGSHDFix", Name = "MGS HD Fix" },
                 new ModRepository { Owner = "nuggslet", Repo = "MGSM2Fix", Name = "MGS M2 Fix" },
                 new ModRepository { Owner = "ANTIBigBoss", Repo = "MGS3-Cheat-Trainer-GUI", Name = "MGS3 Cheat Trainer" },

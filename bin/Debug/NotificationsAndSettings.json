@@ -3837,8 +3837,12 @@
       "Naked Camo Pants - Raindrop": [],
       "MGSHDFix": [
         {
-          "ModFile": "d3d11.dll",
-          "TargetPath": "d3d11.dll"
+          "ModFile": "winhttp.dll",
+          "TargetPath": "winhttp.dll"
+        },
+        {
+          "ModFile": "wininet.dll",
+          "TargetPath": "wininet.dll"
         },
         {
           "ModFile": "MGSHDFix.asi",

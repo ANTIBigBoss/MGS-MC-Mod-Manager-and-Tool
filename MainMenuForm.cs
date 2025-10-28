@@ -16,7 +16,7 @@ namespace ANTIBigBoss_MGS_Mod_Manager
 
         public static class AppInfo
         {
-            public const string CurrentVersion = "1.0.0.9";
+            public const string CurrentVersion = "1.0.1.0";
         }
         private void ShowChangelog()
         {
@@ -66,6 +66,14 @@ namespace ANTIBigBoss_MGS_Mod_Manager
         {
             return
 @"Thanks for using the Mod Manager and Tools! - ANTIBigBoss
+
+ Changelog - 1.0.1.0
+- Thanks to SageFantasma we've added in a model swapping 
+feature with existing MGS2 models to the Modding Tools menu. 
+Allows you to swap Snake and Raiden's model with a 
+selection of available models in the dropdown.
+- Fixed the MGS2 Guard Route Editor's set button as the
+recent update to MGS2 2.0.2 broke that functionality
 
 Changelog - v1.0.0.9
 - Attempted a patch at MGS2 Mods not showing as enabled when a mod was enabled

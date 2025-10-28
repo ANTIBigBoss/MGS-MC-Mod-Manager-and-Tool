@@ -12,9 +12,9 @@ namespace ANTIBigBoss_MGS_Mod_Manager
         private const int PROCESS_ALL_ACCESS = 0x1F0FFF;
 
         // New static offsets (within the EXE)
-        private const int OFFSET_X = 0x15401A0;
-        private const int OFFSET_Y = 0x1693AB0;
-        private const int OFFSET_Z = 0x16E9B08;
+        private const int OFFSET_X = 0x153F190;
+        private const int OFFSET_Y = 0x153F194;
+        private const int OFFSET_Z = 0x153F198;
 
         /// <summary>
         /// Reads the player's X position as a float (Base + OFFSET_X).

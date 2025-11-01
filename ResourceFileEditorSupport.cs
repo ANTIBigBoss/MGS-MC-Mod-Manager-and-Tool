@@ -105,6 +105,21 @@ namespace ANTIBigBoss_MGS_Mod_Manager
                     }
                 }
             }
+
+            public void WriteToFile()
+            {
+                string contents = "";
+                foreach(Ctxr ctxr in CtxrResources)
+                {
+                    contents += ctxr.Path + "\r\r\n";
+                }
+                foreach(Cmdl cmdl in CmdlResources)
+                {
+                    contents += cmdl.Path + "\r\r\n";
+                }
+
+                File.WriteAllText(Path, contents);
+            }
         }
 
         public class Tri : IResource
@@ -504,6 +519,69 @@ namespace ANTIBigBoss_MGS_Mod_Manager
                         GcxResources.Add(new Gcx(resource));
                     }
                 }
+            }
+
+            public void WriteToFile()
+            {
+                string contents = "";
+                foreach (var resource in TriResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in HzxResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in VarResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in SarResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in RowResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in O2dResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in MarResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in Lt2Resources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in KmsResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in FarResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in EvmResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in Cv2Resources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in AnmResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+                foreach (var resource in GcxResources)
+                {
+                    contents += resource.Path + "\r\r\n";
+                }
+
+                File.WriteAllText(Path, contents);
             }
         }
 

@@ -73,8 +73,15 @@ namespace ANTIBigBoss_MGS_Mod_Manager
             ConfigSettings config = ConfigManager.LoadSettings();
             if (!File.Exists(ResourceFileEditorForm._masterResourcesFullPath))
                 MessageBox.Show("Will now begin loading MGS2 resource editor. If this is your first time opening this, it may take several minutes to build the resourcing database. Please be patient. Subsequent loads will utilize a cached database to expediate loading.");
-            ResourceFileEditorForm resourceFileEditorForm = new ResourceFileEditorForm(config.GamePaths["MGS2"]);            
+            ResourceFileEditorForm resourceFileEditorForm = new ResourceFileEditorForm(config.GamePaths["MGS2"]);
             resourceFileEditorForm.ShowDialog();
+        }
+
+        private void modelSwapperButton_Click(object sender, EventArgs e)
+        {
+            ConfigSettings config = ConfigManager.LoadSettings();
+            ModelSwapperForm modelSwapperForm = new ModelSwapperForm(config.GamePaths["MGS2"], config.ModToolsPath);
+            modelSwapperForm.ShowDialog();
         }
     }
 }

@@ -35,6 +35,7 @@
             MGS3GuardRouteTool = new System.Windows.Forms.Button();
             button3 = new System.Windows.Forms.Button();
             mgs2ResourceEditor = new System.Windows.Forms.Button();
+            modelSwapperButton = new System.Windows.Forms.Button();
             SuspendLayout();
             // 
             // BackButton
@@ -133,12 +134,29 @@
             mgs2ResourceEditor.UseVisualStyleBackColor = false;
             mgs2ResourceEditor.Click += mgs2ResourceEditor_Click;
             // 
+            // modelSwapperButton
+            // 
+            modelSwapperButton.BackColor = System.Drawing.Color.FromArgb(51, 51, 51);
+            modelSwapperButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            modelSwapperButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            modelSwapperButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold);
+            modelSwapperButton.ForeColor = System.Drawing.Color.FromArgb(224, 224, 224);
+            modelSwapperButton.Location = new System.Drawing.Point(245, 462);
+            modelSwapperButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            modelSwapperButton.Name = "modelSwapperButton";
+            modelSwapperButton.Size = new System.Drawing.Size(562, 61);
+            modelSwapperButton.TabIndex = 14;
+            modelSwapperButton.Text = "MGS2 Model Swapper";
+            modelSwapperButton.UseVisualStyleBackColor = false;
+            modelSwapperButton.Click += modelSwapperButton_Click;
+            // 
             // ModResourcesForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
             ClientSize = new System.Drawing.Size(1051, 749);
+            Controls.Add(modelSwapperButton);
             Controls.Add(mgs2ResourceEditor);
             Controls.Add(button3);
             Controls.Add(MGS3GuardRouteTool);
@@ -161,5 +179,6 @@
         private System.Windows.Forms.Button MGS3GuardRouteTool;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button mgs2ResourceEditor;
+        private System.Windows.Forms.Button modelSwapperButton;
     }
 }

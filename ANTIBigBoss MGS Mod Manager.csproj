@@ -10,7 +10,25 @@
     <ApplicationIcon>Otacon Pray.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\headnull.evm" />
+    <None Remove="Resources\headnull.evm.cmdl" />
+    <None Remove="Resources\null.evm" />
+    <None Remove="Resources\null.evm.cmdl" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Otacon Pray.ico" />
+    <Content Include="Resources\headnull.evm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\headnull.evm.cmdl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\null.evm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\null.evm.cmdl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AssimpNet" Version="4.1.0" />
@@ -20,9 +38,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.SystemWebAdapters" Version="2.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="DownloadManager.cs">

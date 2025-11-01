@@ -435,6 +435,12 @@ namespace ANTIBigBoss_MGS_Mod_Manager
                 config.Backup.MGS2BackupCompleted = true;
                 ConfigManager.SaveSettings(config);
             }
+
+            //Check to make sure the backup is not missing any directories from the expected paths list
+            if (fileExplorerManager.CheckBackupForCompleteness(gameInstallPath))
+            {
+                fileExplorerManager.BackupVanillaFiles(gameInstallPath);
+            }
         }
 
         #region First Time Setup

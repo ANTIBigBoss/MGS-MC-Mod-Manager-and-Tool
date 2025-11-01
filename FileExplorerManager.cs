@@ -6,9 +6,9 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using IOSearchOption = System.IO.SearchOption;
-using System.Threading.Tasks;
 
 namespace ANTIBigBoss_MGS_Mod_Manager
 {
@@ -82,6 +82,235 @@ namespace ANTIBigBoss_MGS_Mod_Manager
             }
         }
 
+        private bool CheckForResourceFileInMod(string modPath)
+        {
+            DirectoryInfo modDirectory = new DirectoryInfo(modPath);
+
+            FileInfo[] bpAssetsFiles = modDirectory.GetFiles("bp_assets.txt", IOSearchOption.AllDirectories);
+            FileInfo[] manifestFiles = modDirectory.GetFiles("manifest.txt", IOSearchOption.AllDirectories);
+
+            return bpAssetsFiles.Length > 0 || manifestFiles.Length > 0;
+        }
+
+        private void UninstallModTouchingResourceFiles(string modPath, string gameInstallPath)
+        {
+            DirectoryInfo backupDirectory = new DirectoryInfo(backupRoot);
+
+            List<string> linesAddedByOtherMods = new();
+
+            //Need to check ALL installed mods, see if any touch resource files, and if they do, what resources they use.
+            foreach (string mod in config.Mods.ActiveMods.Keys.Where(x => config.Mods.ActiveMods[x] == true)) //only care about currently installed mods
+            {
+                DirectoryInfo otherActiveModDirectory = new DirectoryInfo(Path.Combine(modFolder, mod));
+                if (!otherActiveModDirectory.Exists || otherActiveModDirectory.FullName == modPath)
+                    continue; //This means this mod isn't for the right game
+
+                FileInfo[] bpAssetsOtherModFiles = otherActiveModDirectory.GetFiles("bp_assets.txt", IOSearchOption.AllDirectories);
+                FileInfo[] manifestOtherModFiles = otherActiveModDirectory.GetFiles("manifest.txt", IOSearchOption.AllDirectories);
+                foreach (FileInfo bpAssetsFile in bpAssetsOtherModFiles) 
+                {
+                    string trimmedPath = bpAssetsFile.FullName.Replace(otherActiveModDirectory.FullName, "");
+                    FileInfo bpAssetsVanillaFile = new(backupDirectory.FullName + trimmedPath);
+                    linesAddedByOtherMods.AddRange(DiffFiles(bpAssetsFile, bpAssetsVanillaFile));
+                }
+                foreach(FileInfo manifestFile in manifestOtherModFiles)
+                {
+                    string trimmedPath = manifestFile.FullName.Replace(otherActiveModDirectory.FullName, "");
+                    FileInfo manifestVanillaFile = new(backupDirectory.FullName + trimmedPath);
+                    linesAddedByOtherMods.AddRange(DiffFiles(manifestFile, manifestVanillaFile));
+                }
+            }
+
+            DirectoryInfo modDirectory = new DirectoryInfo(modPath);
+            Dictionary<FileInfo, string> resourceFiles = new();
+            FileInfo[] bpAssetsModFiles = modDirectory.GetFiles("bp_assets.txt", IOSearchOption.AllDirectories);
+            FileInfo[] manifestModFiles = modDirectory.GetFiles("manifest.txt", IOSearchOption.AllDirectories);
+
+            //Then, remove any that are not ALREADY in vanilla and are not required by another, different mod.
+            foreach (FileInfo bpAssetsModFile in bpAssetsModFiles)
+            {
+                resourceFiles.Add(bpAssetsModFile, bpAssetsModFile.FullName);
+                string trimmedPath = bpAssetsModFile.FullName.Replace(modDirectory.FullName, "");
+                FileInfo bpAssetsVanillaFile = new(backupDirectory.FullName + trimmedPath);
+                List<string> linesAddedByThisMod = DiffFiles(bpAssetsModFile, bpAssetsVanillaFile);
+                ResourceFileEditorSupport.BpAssetsFile gameBpAssetsFile = new(gameInstallPath + trimmedPath); 
+                foreach(string lineAdded in linesAddedByThisMod.Where(x=> linesAddedByOtherMods.Contains(x) == false))
+                {
+                    if (lineAdded.Contains(".ctxr"))
+                        gameBpAssetsFile.CtxrResources.Remove(gameBpAssetsFile.CtxrResources.First(x => x.Path == lineAdded));
+                    else
+                        gameBpAssetsFile.CmdlResources.Remove(gameBpAssetsFile.CmdlResources.First(x => x.Path == lineAdded));
+                }
+                gameBpAssetsFile.WriteToFile();
+            }
+            foreach (FileInfo manifestModFile in manifestModFiles)
+            {
+                resourceFiles.Add(manifestModFile, manifestModFile.FullName);
+                string trimmedPath = manifestModFile.FullName.Replace(modDirectory.FullName, "");
+                FileInfo manifestVanillaFile = new(backupDirectory.FullName + trimmedPath);
+                List<string> linesAddedByThisMod = DiffFiles(manifestModFile, manifestVanillaFile);
+                ResourceFileEditorSupport.ManifestFile gameManifestFile = new(gameInstallPath + trimmedPath);
+                foreach (string lineAdded in linesAddedByThisMod.Where(x => linesAddedByOtherMods.Contains(x) == false))
+                {
+                    if (lineAdded.Contains(".tri"))
+                        gameManifestFile.TriResources.Remove(gameManifestFile.TriResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".hzx"))
+                        gameManifestFile.HzxResources.Remove(gameManifestFile.HzxResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".var"))
+                        gameManifestFile.VarResources.Remove(gameManifestFile.VarResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".sar"))
+                        gameManifestFile.SarResources.Remove(gameManifestFile.SarResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".row"))
+                        gameManifestFile.RowResources.Remove(gameManifestFile.RowResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".o2d"))
+                        gameManifestFile.O2dResources.Remove(gameManifestFile.O2dResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".mar"))
+                        gameManifestFile.MarResources.Remove(gameManifestFile.MarResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".lt2"))
+                        gameManifestFile.Lt2Resources.Remove(gameManifestFile.Lt2Resources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".kms"))
+                        gameManifestFile.KmsResources.Remove(gameManifestFile.KmsResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".far"))
+                        gameManifestFile.FarResources.Remove(gameManifestFile.FarResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".evm"))
+                        gameManifestFile.EvmResources.Remove(gameManifestFile.EvmResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".cv2"))
+                        gameManifestFile.Cv2Resources.Remove(gameManifestFile.Cv2Resources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".anm"))
+                        gameManifestFile.AnmResources.Remove(gameManifestFile.AnmResources.First(x => x.Path == lineAdded));
+                    else if (lineAdded.Contains(".gcx"))
+                        gameManifestFile.GcxResources.Remove(gameManifestFile.GcxResources.First(x => x.Path == lineAdded));
+                }
+                gameManifestFile.WriteToFile();
+            }
+
+            //Take resource files out of the mod directory temporarily
+            DirectoryInfo tempDirectory = Directory.CreateTempSubdirectory();
+            foreach (FileInfo resourceFile in resourceFiles.Keys)
+            {
+                resourceFile.MoveTo(Path.Combine(tempDirectory.FullName, resourceFile.Directory.Name + resourceFile.Name));
+            }
+
+            //Uninstall all of the other remaining files normally
+            RestoreVanillaFiles(modPath, gameInstallPath);
+
+            //Move the resource files back into the mod directory for installation purposes later
+            foreach (FileInfo resourceFile in resourceFiles.Keys)
+            {
+                resourceFile.MoveTo(resourceFiles[resourceFile], true);
+            }
+
+            //Be better than every other developer that uses Temp directories and actually clean up after myself.
+            tempDirectory.Delete(true);
+        }
+
+        private List<string> DiffFiles(FileInfo file1, FileInfo file2)
+        {
+            List<string> fileDiff = new ();
+
+            string[] file1Lines = File.ReadAllLines(file1.FullName).Distinct().Where(x => x != "").ToArray(); ; //filter out blanks
+            string[] file2Lines = File.ReadAllLines(file2.FullName).Distinct().Where(x => x != "").ToArray(); ; //filter out blanks
+
+            foreach (string line in file1Lines)
+            {
+                if (!file2Lines.Contains(line))
+                {
+                    fileDiff.Add(line);
+                }
+            }
+
+            //I don't think we care about removed lines at all?
+            return fileDiff;
+        }
+
+        private void InstallModTouchingResourceFiles(string modPath, string gameInstallPath, string selectedVariant)
+        {
+            DirectoryInfo backupDirectory = new DirectoryInfo(backupRoot);
+            DirectoryInfo modDirectory = new DirectoryInfo(modPath);
+
+            FileInfo[] bpAssetsModFiles = modDirectory.GetFiles("bp_assets.txt", IOSearchOption.AllDirectories); 
+            FileInfo[] manifestModFiles = modDirectory.GetFiles("manifest.txt", IOSearchOption.AllDirectories);
+            //FileInfo[] allOtherModFiles = modDirectory.GetFiles("*", IOSearchOption.AllDirectories).Where(x => (bpAssetsModFiles.Contains(x) == false) && (manifestModFiles.Contains(x) == false)).ToArray();
+
+            Dictionary<FileInfo, string> resourceFiles = new();
+
+            foreach(FileInfo bpAssetsModFile in bpAssetsModFiles)
+            {
+                resourceFiles.Add(bpAssetsModFile, bpAssetsModFile.FullName);
+                string trimmedPath = bpAssetsModFile.FullName.Replace(modDirectory.FullName, "");
+                FileInfo bpAssetsVanillaFile = new FileInfo(backupDirectory.FullName + trimmedPath);
+                List<string> linesToAdd = DiffFiles(bpAssetsModFile, bpAssetsVanillaFile);
+                ResourceFileEditorSupport.BpAssetsFile gameBpAssetsFile = new ResourceFileEditorSupport.BpAssetsFile(gameInstallPath + trimmedPath);
+                foreach (string line in linesToAdd)
+                {
+                    if (line.Contains(".ctxr"))
+                        gameBpAssetsFile.CtxrResources.Add(new ResourceFileEditorSupport.Ctxr(line));
+                    else
+                        gameBpAssetsFile.CmdlResources.Add(new ResourceFileEditorSupport.Cmdl(line));
+                }
+                gameBpAssetsFile.WriteToFile();
+            }
+            foreach (FileInfo manifestModFile in manifestModFiles)
+            {
+                resourceFiles.Add(manifestModFile, manifestModFile.FullName);
+                string trimmedPath = manifestModFile.FullName.Replace(modDirectory.FullName, "");
+                FileInfo manifestVanillaFile = new FileInfo(backupDirectory.FullName + trimmedPath);
+                List<string> linesToAdd = DiffFiles(manifestModFile, manifestVanillaFile);
+                ResourceFileEditorSupport.ManifestFile gameManifestFile = new ResourceFileEditorSupport.ManifestFile(gameInstallPath + trimmedPath);
+                foreach (string line in linesToAdd)
+                {
+                    if (line.Contains(".tri"))
+                        gameManifestFile.TriResources.Add(new(line));
+                    else if(line.Contains(".hzx"))
+                        gameManifestFile.HzxResources.Add(new(line));
+                    else if (line.Contains(".var"))
+                        gameManifestFile.VarResources.Add(new(line));
+                    else if (line.Contains(".sar"))
+                        gameManifestFile.SarResources.Add(new(line));
+                    else if (line.Contains(".row"))
+                        gameManifestFile.RowResources.Add(new(line));
+                    else if (line.Contains(".o2d"))
+                        gameManifestFile.O2dResources.Add(new(line));
+                    else if (line.Contains(".mar"))
+                        gameManifestFile.MarResources.Add(new(line));
+                    else if (line.Contains(".lt2"))
+                        gameManifestFile.Lt2Resources.Add(new(line));
+                    else if (line.Contains(".kms"))
+                        gameManifestFile.KmsResources.Add(new(line));
+                    else if (line.Contains(".far"))
+                        gameManifestFile.FarResources.Add(new(line));
+                    else if (line.Contains(".evm"))
+                        gameManifestFile.EvmResources.Add(new(line));
+                    else if (line.Contains(".cv2"))
+                        gameManifestFile.Cv2Resources.Add(new(line));
+                    else if (line.Contains(".anm"))
+                        gameManifestFile.AnmResources.Add(new(line));
+                    else if (line.Contains(".gcx"))
+                        gameManifestFile.GcxResources.Add(new(line));
+                }
+                gameManifestFile.WriteToFile();
+            }
+
+            //Take resource files out of the mod directory temporarily
+            DirectoryInfo tempDirectory = Directory.CreateTempSubdirectory();
+            foreach (FileInfo resourceFile in resourceFiles.Keys)
+            {
+                resourceFile.MoveTo(Path.Combine(tempDirectory.FullName, resourceFile.Directory.Name + resourceFile.Name));
+            }
+
+            //Apply all of the other remaining files normally
+            ApplyModFiles(modPath, gameInstallPath, selectedVariant);
+
+            //Move the resource files back into the mod directory for uninstallation purposes later
+            foreach(FileInfo resourceFile in resourceFiles.Keys)
+            {
+                resourceFile.MoveTo(resourceFiles[resourceFile], true);
+            }
+
+            //Be better than every other developer that uses Temp directories and actually clean up after myself.
+            tempDirectory.Delete(true);
+        }
+
         public async Task<bool> ToggleModStateByNameAsync(string modName, string gameInstallPath)
         {
             bool isEnabled = config.Mods.ActiveMods.TryGetValue(modName, out var enabled) && enabled;
@@ -91,16 +320,31 @@ namespace ANTIBigBoss_MGS_Mod_Manager
             {
                 await Task.Run(() =>
                 {
+                    bool modifiesAnyResourceFile = CheckForResourceFileInMod(modPath);
                     if (isEnabled)
                     {
-                        RestoreVanillaFiles(modPath, gameInstallPath);
+                        if (modifiesAnyResourceFile)
+                        {
+                            UninstallModTouchingResourceFiles(modPath, gameInstallPath);
+                        }
+                        else
+                        {
+                            RestoreVanillaFiles(modPath, gameInstallPath);
+                        }
                         config.Mods.ActiveMods[modName] = false;
                         config.Mods.ActiveVariants.Remove(modName);
                     }
                     else
                     {
                         string selectedVariant = config.Mods.ActiveVariants.TryGetValue(modName, out var variant) ? variant : null;
-                        ApplyModFiles(modPath, gameInstallPath, selectedVariant);
+                        if (modifiesAnyResourceFile)
+                        {
+                            InstallModTouchingResourceFiles(modPath, gameInstallPath, selectedVariant);
+                        }
+                        else
+                        {
+                            ApplyModFiles(modPath, gameInstallPath, selectedVariant);
+                        }
                         config.Mods.ActiveMods[modName] = true;
                     }
                 });
@@ -299,6 +543,11 @@ namespace ANTIBigBoss_MGS_Mod_Manager
 
                 DirectoryCopy(nextSource, nextDest, copySubDirs);
             }
+        }
+
+        private void HandleResourceFileModification()
+        {
+            //
         }
 
 
@@ -601,6 +850,26 @@ namespace ANTIBigBoss_MGS_Mod_Manager
             {
                 LoggingManager.Instance.Log($"Error copying file:\nSource: {sourceFile}\nDestination: {destinationPath}\nError: {ex.Message}");
             }
+        }
+
+        public bool CheckBackupForCompleteness(string gameInstallPath)
+        {
+            if (string.IsNullOrEmpty(gameInstallPath))
+            {
+                MessageBox.Show("Game installation not found, cannot attempt modding.", "Backup Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            foreach(var relativePath in expectedPaths)
+            {
+                string sourcePath = Path.Combine(gameInstallPath, relativePath);
+                string targetPath = Path.Combine(backupRoot, relativePath);
+                if (!Directory.Exists(sourcePath))
+                    continue;
+                if (!Directory.Exists(targetPath))
+                    return false;
+            }
+
+            return true;
         }
 
         public void BackupVanillaFiles(string gameInstallPath)

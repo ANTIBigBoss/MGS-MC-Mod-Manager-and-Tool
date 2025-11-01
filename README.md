@@ -78,6 +78,9 @@ Enable or disable a mod any time with the **Installed / Not Installed** toggle.
 - **[shalashaska/316austin316](https://github.com/316austin316):**  
   A lot of his work helped me in understanding how to get the C# code to convert the CTXR Files into PNG Files.
 
+- **[SpaceCore/Jacky720](https://github.com/Jacky720):**
+  Helped out greatly with the MGS2 model swapping tool!
+
 - **[GIMP Developers](https://www.gimp.org/):**  
   Helped me enable conversion of PNGs into DDS with mip map support.
 
